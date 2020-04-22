@@ -143,6 +143,246 @@ data.loc[data["Profit"] == data["Profit"].max()]
 
 
 
+++++++++++++++++++++++++++++++++++++++++++++++
+
+#MultilinearRegression Strars from here
+
+++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+
+#Salary_Classification
+
+
+# Importing the libraries
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+dataset = pd.read_csv('Salary_Classification.csv')
+
+features = dataset.iloc[:, :-1].values
+labels = dataset.iloc[:, -1].values
+
+
+dataset.isnull().any(axis=0)
+
+# Encoding categorical data
+from sklearn.preprocessing import LabelEncoder
+
+# Create objct of LabelENcoder
+labelencoder = LabelEncoder()
+
+# Fit and Use the operation Transform
+features[:, 0] = labelencoder.fit_transform(features[:, 0])
+
+
+from sklearn.preprocessing import OneHotEncoder
+
+
+onehotencoder = OneHotEncoder(categorical_features = [0])
+
+# Convert to NDArray format
+features = onehotencoder.fit_transform(features).toarray()
+
+features = features[:,1:]
+
+from sklearn.model_selection import train_test_split
+features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size = 0.2, random_state = 0)
+
+
+# Fitting Multiple Linear Regression to the Training set
+# Whether we have Univariate or Multivariate, class is LinearRegression
+
+from sklearn.linear_model import LinearRegression
+regressor = LinearRegression()
+regressor.fit(features_train, labels_train)
+
+print(regressor.intercept_)   
+print (regressor.coef_) 
+
+Pred = regressor.predict(features_test)
+
+print (pd.DataFrame(zip(Pred, labels_test)))
+
+# Prediction for a new values for a person in 'Development', hours worked 1150,
+# 3 certificates , 4yrs of experience. What would be his salary ??
+
+
+
+
+x = ['Development',1150,3,4]
+
+x = np.array(x)
+x = x.reshape(1,4)
+regressor.predict(x)
+#this will show you error
+
+
+x = [1,0,0,1150,3,4]
+x = np.array(x)
+x = x.reshape(1,4)
+regressor.predict(x) #this also show you the error
+
+x = [0,0,1150,3,4]
+x = np.array(x)
+x = x.reshape(1,5)
+regressor.predict(x)
+
+
+Score = regressor.score(features_train, labels_train)
+Score = regressor.score(features_test, labels_test)
+
+
+
+
+
+
+
+
+
+=======================================================================================================
+
+
+
+
+
+
+
+#cars file
+
+
+
+
+import pandas as pd
+import numpy as np
+
+
+# Importing the dataset
+dataset = pd.read_csv('cars.csv')
+X = dataset.iloc[:, :-1].values
+y = dataset.iloc[:, -1].values.reshape(-1,1)
+
+
+# Splitting the dataset into the Training set and Test set
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.5, random_state = 0)
+print (X_train,X_test,y_train, y_test)
+
+
+# Write code to save in the csv file
+
+# Combining the features and labels in both train and test data
+train_data = np.concatenate([X_train, y_train],axis=1)
+test_data = np.concatenate([X_test, y_test], axis=1)
+
+# Fetching all the columns name from the original dataset
+head = list(dataset.columns)
+
+# Framing the test and train dataframe
+train_df, test_df = pd.DataFrame(), pd.DataFrame()
+
+for var in range(0,12):
+    train_df[head[var]] = train_data[:, var]
+    test_df[head[var]] = test_data[:, var]
+
+# Creating seperate train and test csv files
+train_df.to_csv("cars_train.csv")
+test_df.to_csv("cars_test.csv")
+
+# Printing the train and test dataframes
+print("train_data:", train_df)
+print("test_data:", test_df)
+
+
+
+=================================================================================================
+
+#iq size
+
+
+
+import pandas as pd
+import numpy as np
+
+df = pd.read_csv("iq_size.csv")
+
+print(df.dtypes)
+
+#check the datset have null value or not 
+#if it is have null then we need to handle it.
+
+df.isnull().any(axis=0)
+
+#here we need to seprate features and labels
+
+features = df.iloc[:,1:].values
+label = df.iloc[:,0].values 
+
+from sklearn.model_selection import train_test_split
+
+features_train,features_test,label_train,label_test = train_test_split(features,label,test_size = 0.2, random_state=0)
+
+from sklearn.linear_model import LinearRegression
+
+reg = LinearRegression()
+
+reg.fit(features_train,label_train)
+
+pred = reg.predict(features_test)
+
+print(pd.DataFrame(zip(pred,label_test)))
+
+x = [90,70,150]
+
+x = np.array(x)
+x = x.reshape(1,3)
+reg.predict(x)
+
+
+
+=================================================================================================
+
+#female states
+
+
+==================================================================================================
+
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+#Backword Elimination
+#Polinomial
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
