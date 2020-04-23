@@ -207,6 +207,8 @@ print (regressor.coef_)
 Pred = regressor.predict(features_test)
 
 print (pd.DataFrame(zip(Pred, labels_test)))
+print('Train Score: ', regressor.score(features_train, labels_train))  
+print('Test Score: ', regressor.score(features_test, labels_test))
 
 # Prediction for a new values for a person in 'Development', hours worked 1150,
 # 3 certificates , 4yrs of experience. What would be his salary ??
@@ -362,21 +364,137 @@ reg.predict(x)
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+dataset = pd.read_csv("Salary_Classification.csv")
+
+features = dataset.iloc[:,:-1].values
+labels = dataset.iloc[:,4].values
+
+from sklearn.preprocessing import LabelEncoder
+
+labelencoder = LabelEncoder()
+
+features[:, 0] = labelencoder.fit_transform(features[:, 0])
+
+from sklearn.preprocessing import OneHotEncoder
+onehotencoder = OneHotEncoder(categorical_features = [0])
+features = onehotencoder.fit_transform(features).toarray()
+
+features = features[:, 1:]
+
+import statsmodels.api as sm
+features = sm.add_constant(features)
+
+#checking for first time
+features_opt = features[:, [0, 1, 2, 3, 4, 5]]
+regressor_OLS = sm.OLS(endog = labels, exog = features_opt).fit()
+regressor_OLS.summary()
 
 
+#remove x2 and checking for second time
+features_opt = features[:, [0, 1, 3, 4, 5]]
+regressor_OLS = sm.OLS(endog = labels, exog = features_opt).fit()
+regressor_OLS.summary()
 
 
+#remove x3 and checking for third time
+features_opt = features[:, [0, 1, 3, 5]]
+regressor_OLS = sm.OLS(endog = labels, exog = features_opt).fit()
+regressor_OLS.summary()
 
 
+#remove x4 and checking for fourth time
+features_opt = features[:, [0,3, 5]]
+regressor_OLS = sm.OLS(endog = labels, exog = features_opt).fit()
+regressor_OLS.summary()
 
 
+#remove x4 and checking for fourth time
+features_opt = features[:, [0,5]]
+regressor_OLS = sm.OLS(endog = labels, exog = features_opt).fit()
+regressor_OLS.summary()
 
 
+#now we get the our column
+dataset = dataset.iloc[:,3:]
+x_BE= dataset.iloc[:, :-1].values  
+y_BE= dataset.iloc[:, -1].values  
+  
+  
+# Splitting the dataset into training and test set.  
+from sklearn.model_selection import train_test_split  
+x_BE_train, x_BE_test, y_BE_train, y_BE_test= train_test_split(x_BE, y_BE, test_size= 0.2, random_state=0)  
+  
+#Fitting the MLR model to the training set:  
+from sklearn.linear_model import LinearRegression  
+regressor= LinearRegression()  
+regressor.fit(x_BE_train,y_BE_train)
+regressor.fit(nm.array(x_BE_train).reshape(-1,1), y_BE_train)  
+  
+#Predicting the Test set result;  
+y_pred= regressor.predict(x_BE_test)  
+
+dataframe = pd.DataFrame({"Actual":y_BE_test,"Predicted":y_pred})
+  
+#Cheking the score  
+print('Train Score: ', regressor.score(x_BE_train, y_BE_train))  
+print('Test Score: ', regressor.score(x_BE_test, y_BE_test))  
+
+====================================================================================================
 
 
+# Polinomial Regression
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
 
+dataset = pd.read_csv('Claims_Paid.csv')
 
+features = dataset.iloc[:, 0:1].values
+labels = dataset.iloc[:, 1].values
+
+# Fitting Linear Regression to the dataset
+# We can avoid splitting since the dataset is too small
+
+from sklearn.linear_model import LinearRegression
+lin_reg_1 = LinearRegression()
+lin_reg_1.fit(features, labels)
+
+print (lin_reg_1.predict([[1981]]))
+
+plt.scatter(features, labels, color = 'red')   #by simple linear regression
+plt.plot(features, lin_reg_1.predict(features), color = 'blue')
+plt.title('Linear Regression')
+plt.xlabel('Year')
+plt.ylabel('Claims Paid')
+plt.show()
+
+
+from sklearn.preprocessing import PolynomialFeatures     #by poly nomial regression
+poly_object = PolynomialFeatures(degree = 6)
+
+features_poly = poly_object.fit_transform(features)
+lin_reg_2 = LinearRegression()
+lin_reg_2.fit(features_poly, labels)
+
+print ("Predicting result with Polynomial Regression")
+print (lin_reg_2.predict(poly_object.transform([[1981]])))   #predict the value by polinomial
+
+
+plt.scatter(features, labels, color = 'red')
+plt.plot(features, lin_reg_2.predict(poly_object.fit_transform(features)), color = 'blue')
+plt.title('Polynomial Regression')
+plt.xlabel('Year')
+plt.ylabel('Claims Paid')
+plt.show()
+
+
+======================================================================================================
 
 
 
