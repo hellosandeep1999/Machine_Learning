@@ -497,6 +497,296 @@ plt.show()
 ======================================================================================================
 
 
++++++++++++++++++++++++++
+
+Logistic Regrssion 
+
+
+
++++++++++++++++++++++++++++++++
+
+
+#result(pass or fail) according to study of hours
+
+#BY linear regression
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+HOURS = [0.50,0.75,1.00,1.25,1.50,1.75,2.00,2.25,2.50,2.75,3.00,3.25,3.50,3.75,4.00,4.25,4.50,4.75,5.00,5.50]
+PASS = [0,0,0,0,0,0,1,0,1,0,1,0,1,0,1,1,1,1,1,1]
+
+plt.scatter(HOURS,PASS)
+
+
+from sklearn.linear_model import LinearRegression  
+regressor = LinearRegression() 
+
+# Converted the data into NDArray
+regressor.fit(np.array(HOURS).reshape(-1,1), np.array(PASS).reshape(-1,1)) 
+
+plt.scatter(HOURS, PASS, color = 'red')
+plt.plot(HOURS, regressor.predict(np.array(HOURS).reshape(-1,1)), color = 'blue')
+plt.title('Study Hours and Exam Score')
+plt.xlabel('Study Hours')
+plt.ylabel('Exam Score: Marks')
+plt.show()
+
+#actually it is giving most waste results 
+
+===========================================================================
+
+#heart disease problem
+
+import sklearn as sk
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+heart = pd.read_csv('Heart_Disease.csv', sep=',',header=0)  
+
+#there is not any categorical data
+heart.head()
+heart.sample(5)
+
+#checking for null value
+heart.isnull().any(axis=0)
+
+labels = heart.iloc[:,9].values 
+features = heart.iloc[:,:9].values
+
+# Splitting the dataset into the Training set and Test set
+from sklearn.model_selection import train_test_split
+features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size = 0.25, random_state = 0)
+
+
+
+# Feature Scaling
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+features_train = sc.fit_transform(features_train)
+
+# He has already calculated the mean and sd, so we only need to transform
+features_test = sc.transform(features_test)
+
+
+# Fitting Logistic Regression to the Training set
+from sklearn.linear_model import LogisticRegression
+classifier = LogisticRegression()
+classifier.fit(features_train, labels_train)
+
+probability = classifier.predict_proba(features_test)
+print(probability)
+
+
+# Predicting the class labels ( 0 or 1 )
+labels_pred = classifier.predict(features_test)
+
+# Comparing the predicted and actual values
+my_frame= pd.DataFrame(labels_pred, labels_test)
+print(my_frame)
+
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(labels_test, labels_pred)
+print(cm)  #(68+20)/116 == 0.7586206896551724 
+
+==============================================================================================
+
+++++++++++++++++++++++++++++++++++++++
+
+#KNN Algorithm
+
++++++++++++++++++++++++++++++++++++++
+
+#Caesarian Data
+
+
+import sklearn as sk  
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Last column marks whether it was caesarian or not ( 1 or 0 )
+df = pd.read_csv('caesarian.csv')  
+
+labels = df.iloc[:,5].values 
+features = df.iloc[:,:-1].values
+
+# Splitting the dataset into the Training set and Test set
+from sklearn.model_selection import train_test_split
+features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size = 0.25, random_state = 41)
+
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+features_train = sc.fit_transform(features_train)
+features_test = sc.transform(features_test)
+
+
+# Fitting Logistic Regression to the Training set
+from sklearn.neighbors import KNeighborsClassifier
+
+# When p = 1, this is equivalent to using manhattan_distance (l1), 
+# and euclidean_distance (l2) for p = 2
+classifier = KNeighborsClassifier(n_neighbors = 5,metric = 'minkowski',p = 2) 
+
+classifier.fit(features_train, labels_train)
+
+labels_pred = classifier.predict(features_test)
+
+# Making the Confusion Matrix
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(labels_test, labels_pred)
+
+print(cm)    #14/20  ==  0.7
+
+========================================================================================================
+
+
+#social networking adds
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Importing the dataset
+# Last column, whether you have clicked the Ad or no
+dataset = pd.read_csv('Social_Network_Ads.csv')
+features = dataset.iloc[:, :-1].values
+labels = dataset.iloc[:, 2].values
+
+# Splitting the dataset into the Training set and Test set
+from sklearn.model_selection import train_test_split
+features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size = 0.25, random_state = 40)
+
+# Feature Scaling
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+features_train = sc.fit_transform(features_train)
+features_test = sc.transform(features_test)
+
+# Fitting Logistic Regression to the Training set
+from sklearn.linear_model import LogisticRegression
+classifier = LogisticRegression()
+classifier.fit(features_train, labels_train)
+
+#Calculate Class Probabilities
+probability = classifier.predict_proba(features_test)
+
+# Predicting the class labels
+labels_pred = classifier.predict(features_test)
+
+data = pd.DataFrame({"Actual":labels_test,"Predicted":labels_pred})
+
+# Making the Confusion Matrix
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(labels_test, labels_pred)
+print(cm)     #81/100   ==   0.81    A very good result
+
+
+
+# qus was if sandeep age is 20 and salary is 50000 than he will click on add or not
+
+labels_pred = classifier.predict([[20,50000]])   #array([1], dtype=int64)
+
+#yes he click on add
+
+=====================================================================================================
+
+#tree add health
+
+
+"""
+
+Build a classification tree model evaluating if an adolescent would smoke regularly 
+    or not based on: gender, age, (race/ethnicity) Hispanic, White, Black, Native American 
+    and Asian, alcohol use, alcohol problems, marijuana use, cocaine use, inhalant use, 
+    availability of cigarettes in the home, depression, and self-esteem.
+    
+    
+    
+"""
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Importing the dataset
+dataset = pd.read_csv('tree_addhealth.csv')
+
+dataset = dataset.drop(dataset.index[88])
+dataset.isnull().any(axis=0)
+
+dataset["age"] = dataset["age"].fillna(dataset["age"].mean())
+dataset["SCHCONN1"] = dataset["SCHCONN1"].fillna(dataset["SCHCONN1"].mean())
+dataset["GPA1"] = dataset["GPA1"].fillna(dataset["GPA1"].mean())
+dataset["PARPRES"] = dataset["PARPRES"].fillna(dataset["PARPRES"].mean())
+
+
+features = dataset.iloc[:, [0,1,2,3,4,5,6,8,9,10,11,12,13,14,15]].values
+labels = dataset.iloc[:, 7].values
+
+from sklearn.model_selection import train_test_split
+features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size = 0.25, random_state = 40)
+
+# Feature Scaling
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+features_train = sc.fit_transform(features_train)
+features_test = sc.transform(features_test)
+
+# Fitting Logistic Regression to the Training set
+from sklearn.linear_model import LogisticRegression
+classifier = LogisticRegression()
+classifier.fit(features_train, labels_train)
+
+#Calculate Class Probabilities
+probability = classifier.predict_proba(features_test)
+
+# Predicting the class labels
+labels_pred = classifier.predict(features_test)
+
+data = pd.DataFrame({"Actual":labels_test,"Predicted":labels_pred})
+
+# Making the Confusion Matrix
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(labels_test, labels_pred)
+print(cm)   # 0.9545454545454546  it is very good prediction
+
+========================================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
