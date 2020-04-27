@@ -755,10 +755,318 @@ print(cm)   # 0.9545454545454546  it is very good prediction
 ========================================================================================================
 
 
+++++++++++++++++++++++++++++++++++++
+
+#Decision Tree
+
+
+++++++++++++++++++++++++++++++++++++
+
+
+#bill authentication
+
+
+import pandas as pd  
+import numpy as np  
+import matplotlib.pyplot as plt  
+dataset = pd.read_csv("bill_authentication.csv")  
+
+dataset.head()
+pd.set_option('display.max_columns', None)
+dataset.sample(100)
+
+
+# Finding missing data
+dataset.isnull().any(axis=0)
+
+features = dataset.drop('Class', axis=1)
+print(features)
+print(features.shape)
+
+  
+labels = dataset['Class']  
+print(labels)
+print(labels.shape)
+
+
+# Train and test split
+from sklearn.model_selection import train_test_split  
+features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size=0.20)  
+
+from sklearn.tree import DecisionTreeClassifier  
+classifier = DecisionTreeClassifier()  
+classifier.fit(features_train, labels_train)
+
+
+labels_pred = classifier.predict(features_test) 
+
+# Comparing the predicted and actual values
+my_frame= pd.DataFrame({'Actual':labels_test, 'Predicted':labels_pred})
+print(my_frame)
+
+
+# Evaluating score
+# For classification tasks some commonly used metrics are confusion matrix, 
+# precision, recall, and F1 score.
+from sklearn.metrics import confusion_matrix  
+cm = confusion_matrix(labels_test, labels_pred)
+print(cm)  
+
+# Model Score = 98.90 times out of 100 model prediction was RIGHT
+print((cm[0][0] + cm[1][1]) / (cm[0][0] + cm[1][1] + cm[0][1] + cm[1][0]))
+
+
+#Evaluate the algo
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+print(confusion_matrix(labels_test,labels_pred))  
+print(classification_report(labels_test,labels_pred))  
+print(accuracy_score(labels_test, labels_pred))
+
+==============================================================================================
+
+
+#petrol_consumption
+
+
+import pandas as pd
+import numpy as np
+
+# This is  a regression problem
+dataset = pd.read_csv('petrol_consumption.csv')  
+
+#data analysis
+dataset.shape
+
+
+# Checking for Categorical Data
+dataset.head()
+pd.set_option('display.max_columns', None)
+dataset.sample(10)
+
+
+# Finding missing data
+dataset.isnull().any(axis=0)
+
+
+features = dataset.drop('Petrol_Consumption', axis=1)  
+labels = dataset['Petrol_Consumption'] 
+
+from sklearn.model_selection import train_test_split  
+features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size=0.2, random_state=0) 
+
+from sklearn.tree import DecisionTreeRegressor  
+regressor = DecisionTreeRegressor()  
+regressor.fit(features_train, labels_train)  
+
+labels_pred = regressor.predict(features_test)
+
+df=pd.DataFrame({'Actual':labels_test, 'Predicted':labels_pred})  
+print(df)  
+
+
+#Evaluating the algorithm
+from sklearn import metrics
+
+print('Mean Absolute Error:', metrics.mean_absolute_error(labels_test, labels_pred))  
+print('Mean Squared Error:', metrics.mean_squared_error(labels_test, labels_pred))  
+print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(labels_test, labels_pred)))  
+print (np.mean(labels))
 
 
 
 
+===============================================================================================
+
+#past hires
+
+import pandas as pd  
+import numpy as np  
+import matplotlib.pyplot as plt
+
+dataset = pd.read_csv("PastHires.csv")  
+
+#data analysis
+dataset.shape
+
+# Checking for Categorical Data
+# Best part is that DT and RF works on the categorical data also
+# We do not need to perform the Label encoding for it, Algo does it internally 
+
+dataset.head()
+pd.set_option('display.max_columns', None)
+dataset.sample(10)
+
+
+# Finding missing data
+dataset.isnull().any(axis=0)
+
+
+# Preparing the dataset
+# This technique of dropping can be used when the label is in between features
+features = dataset.drop('Hired', axis=1)
+features = features.values
+
+# Label Encoding for Features
+
+
+
+# Encoding categorical data
+from sklearn.preprocessing import LabelEncoder
+labelencoder = LabelEncoder()
+
+#For Column --->  Employed?
+features[:, 1] = labelencoder.fit_transform(features[:, 1])
+
+#For Column --->  Level of Education
+features[:, 3] = labelencoder.fit_transform(features[:, 3])
+
+#For Column --->  Top-tier school
+features[:, 4] = labelencoder.fit_transform(features[:, 4])
+
+#For Column --->  Internet
+features[:, 5] = labelencoder.fit_transform(features[:, 5])
+
+
+#we need to onehotencoding for this column
+from sklearn.preprocessing import OneHotEncoder
+onehotencoder = OneHotEncoder(categorical_features = [3])
+features = onehotencoder.fit_transform(features).toarray()
+features = features[:, 1:]
+
+
+
+
+# Label Encoding for Features
+labels = dataset['Hired']  
+labels = labels.values
+
+#For Column --->  Hired
+labels = labelencoder.fit_transform(labels)
+
+
+
+# Train and test split
+from sklearn.model_selection import train_test_split  
+features_train, features_test, labels_train, labels_test = \
+train_test_split(features, labels, test_size=0.20)  
+
+# Training and making predictions 
+# We need to be careful in using DecissionTreeClassifier or DecissionTreeRegressor
+from sklearn.tree import DecisionTreeClassifier  
+classifier = DecisionTreeClassifier()  
+classifier.fit(features_train, labels_train)
+
+
+labels_pred = classifier.predict(features_test) 
+
+# Comparing the predicted and actual values
+my_frame= pd.DataFrame({'Actual':labels_test, 'Predicted':labels_pred})
+print(my_frame)
+
+
+# Evaluating score
+# For classification tasks some commonly used metrics are confusion matrix, 
+# precision, recall, and F1 score.
+from sklearn.metrics import confusion_matrix  
+cm = confusion_matrix(labels_test, labels_pred)
+print(cm)  
+
+# Model Score = 100% times out of 100 model prediction was RIGHT
+print((cm[0][0] + cm[1][1]) / (cm[0][0] + cm[1][1] + cm[0][1] + cm[1][0]))
+
+
+#Evaluate the algo
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+print(confusion_matrix(labels_test,labels_pred))  
+print(classification_report(labels_test,labels_pred))  
+print(accuracy_score(labels_test, labels_pred))
+
+
+
+=============================================================================================
+
+
+
+
+
+
+
+
+
+ 
+
+"""
+Build a classification tree model evaluation if an adolescent gets expelled 
+or not from school based on their Gender and violent behavior.
+Use random forest in relation to regular smokers as a target and explanatory 
+variable specifically with Hispanic, White, Black, Native American and Asian.
+
+"""
+
+
+
+
+
+
+import pandas as pd  
+import numpy as np  
+import matplotlib.pyplot as plt 
+
+# This is  a regression problem
+dataset = pd.read_csv('tree_addhealth.csv')  
+
+#data analysis
+dataset.shape
+
+
+# Checking for Categorical Data
+dataset.head()
+pd.set_option('display.max_columns', None)
+dataset.sample(10)
+
+
+# Finding missing data
+dataset.isnull().any(axis=0)
+
+age_mean = dataset["age"].mean()
+dataset["age"] = dataset["age"].fillna(age_mean)
+
+dataset.columns
+
+
+features = dataset.loc[:,['BIO_SEX', 'HISPANIC', 'WHITE', 'BLACK', 'NAMERICAN', 'ASIAN', 'age']].values  
+labels = dataset['EXPEL1'].fillna(0)
+
+
+# Train and test split
+from sklearn.model_selection import train_test_split  
+features_train, features_test, labels_train, labels_test = \
+train_test_split(features, labels, test_size=0.20)  
+
+# Training and making predictions 
+from sklearn.ensemble import RandomForestClassifier
+
+
+classifier = RandomForestClassifier(n_estimators=20, random_state=0)  
+classifier.fit(features_train, labels_train)  
+
+labels_pred = classifier.predict(features_test)
+
+# Comparing the predicted and actual values
+my_frame= pd.DataFrame({'Actual':labels_test, 'Predicted':labels_pred})
+print(my_frame)
+
+
+# Evaluating score
+# For classification tasks some commonly used metrics are confusion matrix, 
+# precision, recall, and F1 score.
+from sklearn.metrics import confusion_matrix  
+cm = confusion_matrix(labels_test, labels_pred)
+print(cm)  
+
+
+
+=======================================================================================================
 
 
 
