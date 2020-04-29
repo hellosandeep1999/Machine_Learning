@@ -1069,6 +1069,488 @@ print(cm)
 =======================================================================================================
 
 
+++++++++++++++++++++++++++++++++++
+
+Random Forest Algorithm
+
++++++++++++++++++++++++++++++++++
+
+
+import pandas as pd
+
+dataset = pd.read_csv("bill_authentication.csv")  
+
+dataset.isnull().any(axis=0)
+
+features = dataset.iloc[:, 0:4].values  
+labels = dataset.iloc[:, 4].values 
+
+from sklearn.model_selection import train_test_split
+features_train, features_test, labels_train, labels_test = \
+train_test_split(features, labels, test_size=0.2, random_state=0)  
+
+from sklearn.preprocessing import StandardScaler
+
+sc = StandardScaler()  
+features_train = sc.fit_transform(features_train)  
+features_test = sc.transform(features_test) 
+
+
+from sklearn.ensemble import RandomForestClassifier
+
+classifier = RandomForestClassifier(n_estimators=20, random_state=0)  
+classifier.fit(features_train, labels_train)  
+
+
+labels_pred = classifier.predict(features_test) 
+
+# Comparing the predicted and actual values
+my_frame= pd.DataFrame({'Actual':labels_test, 'Predicted':labels_pred})
+print(my_frame)
+
+
+from sklearn.metrics import confusion_matrix  
+cm = confusion_matrix(labels_test, labels_pred)
+print(cm)  
+
+# Model Score = 98.90 times out of 100 model prediction was RIGHT
+print( (cm[0][0] + cm[1][1]) / (cm[0][0] + cm[1][1] + cm[0][1] + cm[1][0]))
+
+
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+print(confusion_matrix(labels_test,labels_pred))  
+print(classification_report(labels_test,labels_pred))  
+print(accuracy_score(labels_test, labels_pred))
+
+==================================================================================================
+
+
+
+"""
+Problem Definition
+The problem here is to predict the gas consumption (in millions of gallons) 
+in 48 of the US states based on petrol tax (in cents), per capita income 
+(dollars), paved highways (in miles) and the proportion of population with 
+the driving license.
+"""
+
+#Import libraries
+import pandas as pd  
+import numpy as np  
+dataset = pd.read_csv('petrol_consumption.csv') 
+
+features = dataset.iloc[:, 0:4].values  
+labels = dataset.iloc[:, 4].values  
+
+from sklearn.model_selection import train_test_split
+features_train, features_test, labels_train, labels_test = \
+train_test_split(features, labels, test_size=0.2, random_state=0) 
+
+
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()  
+features_train = sc.fit_transform(features_train)  
+features_test = sc.transform(features_test)  
+
+#train the model
+from sklearn.ensemble import RandomForestRegressor
+
+regressor = RandomForestRegressor(n_estimators=25, random_state=0)  
+regressor.fit(features_train, labels_train)                       
+
+labels_pred = regressor.predict(features_test)
+
+df=pd.DataFrame({'Actual':labels_test, 'Predicted':labels_pred})  
+print(df) 
+
+
+#Evaluating the algorithm
+from sklearn import metrics
+
+print('Mean Absolute Error:', metrics.mean_absolute_error(labels_test, labels_pred))  
+print('Mean Squared Error:', metrics.mean_squared_error(labels_test, labels_pred))  
+print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(labels_test, labels_pred)))  
+print (np.mean(labels))
+
+
+-------------------------------------------
+
+#Change the number of estimators
+regressor = RandomForestRegressor(n_estimators=300, random_state=0)  
+regressor.fit(features_train, labels_train)  
+
+
+labels_pred = regressor.predict(features_test)
+
+df=pd.DataFrame({'Actual':labels_test, 'Predicted':labels_pred})  
+print(df) 
+
+print('Mean Absolute Error:', metrics.mean_absolute_error(labels_test, labels_pred))  
+print('Mean Squared Error:', metrics.mean_squared_error(labels_test, labels_pred))  
+print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(labels_test, labels_pred))) 
+
+
+
+==================================================================================================
+
+
++++++++++++++++++++++++++++++++++++++++++++++++
+
+Model performance metric
+
++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+dataset = pd.read_csv("student_scores.csv")
+
+dataset.shape
+dataset.ndim
+dataset.head()
+dataset.describe()
+dataset.info()
+dataset.dtypes
+
+plt.boxplot(dataset.values)
+
+#plt.scatter(dataset["Hours"],dataset["Scores"]) 
+
+dataset.plot(x='Hours', y='Scores', style='o')  
+plt.title('Hours vs Percentage')  
+plt.xlabel('Hours Studied')  
+plt.ylabel('Percentage Score')  
+plt.show()
+
+#prepare the data to train the model
+features = dataset.iloc[:, :-1].values  
+labels = dataset.iloc[:, 1].values 
+
+from sklearn.model_selection import train_test_split  
+features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size=0.2, random_state=0)  
+
+#train the algo
+from sklearn.linear_model import LinearRegression  
+regressor = LinearRegression()  
+regressor.fit(features_train, labels_train)  
+
+#To see the value of the intercept and slop calculated by the linear regression algorithm for our dataset, execute the following code.
+print(regressor.intercept_)  
+print (regressor.coef_)
+
+"""
+Defination of Coefficient
+This means that for every one unit of change in hours studied ( x axis), 
+the change in the score(y axis)  is about 9.91%. 
+"""
+
+
+labels_pred = regressor.predict(features_test) 
+df = pd.DataFrame({'Actual': labels_test, 'Predicted': labels_pred})  
+print ( df )
+
+
+#Visualize the best fit line
+import matplotlib.pyplot as plt
+
+# Visualising the Test set results
+plt.scatter(features_test, labels_test, color = 'red')
+plt.plot(features_train, regressor.predict(features_train), color = 'blue')
+plt.title('Study Hours and Exam Score')
+plt.xlabel('Study Hours')
+plt.ylabel('Marks')
+plt.show()
+
+
+
+===========================================================================================
+# Logistic Regression ( Classification)
+
+
+# Importing the libraries
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Importing the dataset
+dataset = pd.read_csv('Social_Network_Ads.csv')
+features = dataset.iloc[:, :-1].values
+labels = dataset.iloc[:, 2].values
+
+# Splitting the dataset into the Training set and Test set
+from sklearn.model_selection import train_test_split
+features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size = 0.25, random_state = 0)
+
+# Feature Scaling
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+features_train = sc.fit_transform(features_train)
+features_test = sc.transform(features_test)
+
+# Fitting Logistic Regression to the Training set
+from sklearn.linear_model import LogisticRegression
+classifier = LogisticRegression()
+classifier.fit(features_train, labels_train)
+
+# Predicting the Test set results
+labels_pred = classifier.predict(features_test)
+
+
+# Making the Confusion Matrix
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(labels_test, labels_pred)
+print(cm)
+
+
+from sklearn.metrics import precision_score
+ 
+# Take turns considering the positive class either 0 or 1
+print (precision_score(labels_test, labels_pred, pos_label=0)  )
+print (precision_score(labels_test, labels_pred, pos_label=1)  )
+
+===============================================================================================
+
+
+++++++++++++++++++++++++++
+
+Regularization
+
+++++++++++++++++++++++++++++
+
+
+#Bosten dataset
+
+
+import numpy as np 
+import pandas as pd 
+import sklearn
+import seaborn as sns
+from sklearn.preprocessing import StandardScaler
+#from sklearn.cross_validation import train_test_split
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+
+from sklearn import datasets
+
+boston = datasets.load_boston()
+
+print(boston.DESCR)
+
+#inforation about boston dataset
+boston.keys() 
+boston.data  # ( features )
+boston.data.shape
+boston.feature_names
+boston.target 
+
+boston_df = pd.DataFrame(boston.data,columns=boston.feature_names)
+boston_df.head()
+
+#add dependent variables
+boston_df['House_Price']= boston.target
+boston_df.head ()
+boston_df.describe()
+
+features = boston_df.drop('House_Price',axis = 1)
+labels = boston_df['House_Price']
+features.head()
+labels.head()
+
+
+#Create train and test data with 70o/o and 30°/o split
+features_train, features_test, labels_train,labels_test  =  train_test_split(features, labels, test_size=0.3, random_state=1)
+
+features_train.shape
+
+features_test.shape
+
+labels_train.shape
+labels_test.shape
+
+from sklearn.linear_model import LinearRegression 
+from sklearn.linear_model import Lasso 
+from sklearn.linear_model import Ridge  # RidgeClassier is also there
+from sklearn.linear_model import ElasticNet
+lm = LinearRegression ()
+lm_lasso = Lasso() 
+lm_ridge =  Ridge() 
+lm_elastic = ElasticNet() 
+
+
+#Fit a model on the train data
+lm.fit(features_train, labels_train)
+lm_lasso.fit(features_train, labels_train)
+lm_ridge.fit(features_train, labels_train)
+lm_elastic.fit(features_train, labels_train)
+
+plt.figure (figsize= (15,10))
+ft_importances_lm = pd.Series(lm.coef_, index= features.columns)
+ft_importances_lm .plot(kind = 'barh')
+plt.show()
+
+
+print ("RSquare Value for Simple Regresssion TEST data is-") 
+print (np.round (lm .score(features_test,labels_test)*100,2))
+
+print ("RSquare Value for Lasso Regresssion TEST data is-")
+print (np.round (lm_lasso.score(features_test,labels_test)*100,2))
+
+print ("RSquare Value for Ridge Regresssion TEST data is-")
+print (np.round (lm_ridge.score(features_test,labels_test)*100,2))
+
+print ("RSquare Value for Elastic Net Regresssion TEST data is-")
+print (np.round (lm_elastic.score(features_test,labels_test)*100,2))
+
+#Predict on test and training data
+
+predict_test_lm =	lm.predict(features_test ) 
+predict_test_lasso = lm_lasso.predict (features_test) 
+predict_test_ridge = lm_ridge.predict (features_test)
+predict_test_elastic = lm_elastic.predict(features_test)
+
+#Print the Loss Funtion - MSE & MAE
+
+import numpy as np
+from sklearn import metrics
+print ("Simple Regression Mean Square Error (MSE) for TEST data is") 
+print (np.round (metrics .mean_squared_error(labels_test, predict_test_lm),2) )
+
+print ("Lasso Regression Mean Square Error (MSE) for TEST data is") 
+print (np.round (metrics .mean_squared_error(labels_test, predict_test_lasso),2))
+
+print ("Ridge Regression Mean Square Error (MSE) for TEST data is") 
+print (np.round (metrics .mean_squared_error(labels_test, predict_test_ridge),2))
+
+print ("ElasticNet Mean Square Error (MSE) for TEST data is")
+print (np.round (metrics .mean_squared_error(labels_test, predict_test_elastic),2))
+
+==========================================================================================
+
+
+
+#Import Libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+#Data Analysis
+data = pd.read_csv("Advertising.csv")
+data.head()
+
+#Drop the first column
+
+data.drop(['Unnamed: 0'], axis=1, inplace=True)
+
+print (data.head())
+
+print (data.columns)
+
+#lets plot few visuals
+def scatter_plot(feature, target):
+    plt.scatter(data[feature], data[target], c='black')
+    plt.xlabel("Money spent on {} ads ($)".format(feature))
+    plt.ylabel("Sales ($k)")
+    plt.show()
+
+scatter_plot('TV', 'sales')
+scatter_plot('radio', 'sales')
+scatter_plot('newspaper', 'sales')
+
+#Lets build the models now
+#Multiple Linear Regression
+from sklearn.model_selection import cross_val_score
+from sklearn.linear_model import LinearRegression
+
+features = data.drop(['sales'], axis=1) #drop the target to get the features
+labels = data['sales'].values.reshape(-1,1) #choose the target
+
+lin_reg = LinearRegression()
+
+MSEs = cross_val_score(lin_reg, features, labels, scoring='neg_mean_squared_error', cv=5)
+
+mean_MSE = np.mean(MSEs)
+
+print(mean_MSE)
+
+
+#Ridge Regression
+from sklearn.model_selection import GridSearchCV
+from sklearn.linear_model import Ridge
+
+#alpha = [1e-15, 1e-10, 1e-8, 1e-4, 1e-3,1e-2, 1, 5, 10, 20]
+
+ridge = Ridge()
+
+parameters = {'alpha': [1e-15, 1e-10, 1e-8, 1e-4, 1e-3,1e-2, 1, 5, 10, 20]}
+
+ridge_regressor = GridSearchCV(ridge, parameters,scoring='neg_mean_squared_error', cv=5)
+
+ridge_regressor.fit(features, labels)
+
+ridge_regressor.best_params_
+ridge_regressor.best_score_
+
+
+#Lasso
+from sklearn.linear_model import Lasso
+
+lasso = Lasso()
+"""
+For ridge regression, we introduce GridSearchCV. 
+This will allow us to automatically perform 5-fold cross-validation with a range of different regularization parameters in order to find the optimal value of alpha.
+"""
+
+parameters = {'alpha': [1e-15, 1e-10, 1e-8, 1e-4, 1e-3,1e-2, 1, 5, 10, 20]}
+
+lasso_regressor = GridSearchCV(lasso, parameters, scoring='neg_mean_squared_error', cv = 5)
+
+lasso_regressor.fit(features, labels)
+
+lasso_regressor.best_params_
+lasso_regressor.best_score_
+
+
+=======================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
