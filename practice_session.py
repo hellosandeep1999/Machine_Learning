@@ -1515,50 +1515,447 @@ lasso_regressor.best_score_
 =======================================================================================
 
 
++++++++++++++++++++++++++++++++++++++
+
+Support Vector Machine
+
++++++++++++++++++++++++++++++++++++++
+
+
+#Match_MAking
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+dataset = pd.read_csv("Match_Making.csv")
+
+features = dataset.iloc[:, :-1].values
+labels = dataset.iloc[:, -1].values
+
+# Splitting the dataset into the Training set and Test set
+from sklearn.model_selection import train_test_split
+features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size = 0.3, random_state = 0)
+
+from sklearn.svm import SVC
+# SVM ( SVC for classification and SVR for Regression )
+classifier = SVC(kernel = 'poly', random_state = 0)
+classifier.fit(features_train, labels_train)
+
+labels_pred = classifier.predict(features_test)
+
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(labels_test, labels_pred)
+print(cm)
+
+# Model Score
+print( (cm[0][0] + cm[1][1]) / (cm[0][0] + cm[1][1] + cm[0][1] + cm[1][0]))
+
+score = classifier.score(features_test,labels_test)
+print(score)
+
+
+#Visualization Way New
+x_min, x_max = features_train[:, 0].min() - 1, features_train[:, 0].max() + 1
+y_min, y_max = features_train[:, 1].min() - 1, features_train[:, 1].max() + 1
+
+xx, yy = np.meshgrid(np.arange(x_min, x_max, 0.1),
+                     np.arange(y_min, y_max, 0.1))
+# Obtain labels for each point in mesh using the model.
+# ravel() is equivalent to flatten method.
+# data dimension must match training data dimension, hence using ravel
+Z = classifier.predict(np.c_[xx.ravel(), yy.ravel()]).reshape(xx.shape)
+
+# Plot the points
+plt.plot(features_test[labels_test == 0, 0], features_test[labels_test == 0, 1], 'ro', label='Class 1')
+plt.plot(features_test[labels_test == 1, 0], features_test[labels_test == 1, 1], 'bo', label='Class 2')
+#plot the decision boundary
+plt.contourf(xx, yy, Z, alpha=1.0)
+
+plt.show()
+
+
+
+======================================================================================================
+
+
+++++++++++++++++++++++++++++++++++++++++
+
+
+Naive Bayes
+
++++++++++++++++++++++++++++++++++++++++++++
+
+
+#training titanic
 
 
 
 
+    
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+from sklearn.naive_bayes import GaussianNB, BernoulliNB, MultinomialNB
+
+# Importing dataset
+data = pd.read_csv("training_titanic.csv")
+
+print(data.shape)
+
+
+# Convert categorical variable to numeric ( Label Encoding )
+# Label Encoding using numpy
+
+data["Sex_cleaned"]=np.where(data["Sex"]=="male",0,1)
+
+print(data.shape)
+
+
+data["Embarked_cleaned"]=np.where(data["Embarked"]=="S",0,
+                                  np.where(data["Embarked"]=="C",1,
+                                           np.where(data["Embarked"]=="Q",2,3)
+                                          )
+                                 )
+                                  
+                                  # S == 0  C == 1  Q == 2  anyother == 3
+print(data.shape)
+             
+
+                     
+# Cleaning dataset of NaN
+# This will delete the data which has categorical data and missing rows
+data.isnull().any(axis=0)
+data=data[[
+    "Survived",
+    "Pclass",
+    "Sex_cleaned",
+    "Age",
+    "SibSp",
+    "Parch",
+    "Fare",
+    "Embarked_cleaned"
+]].dropna(axis=0, how='any')  # any and all reference to the columns
+
+print(data.shape)  # this has deleted the missing data rows
+
+
+# Split dataset in training and test datasets
+from sklearn.model_selection import train_test_split
+
+# We have not seperated the feature and label, we have given the whole data
+# thats why we only have features test and train 
+# we have taken care where we are training the model in fit method
+features_train, features_test =\
+train_test_split(data, test_size=0.5, random_state=0)
+#  we are passing full data as features and no labels are passed
+
+
+gnb = GaussianNB()
+
+used_features =[
+    "Pclass",
+    "Sex_cleaned",
+    "Age",
+    "SibSp",
+    "Parch",
+    "Fare",
+    "Embarked_cleaned"
+]  # "Survived" is the column for labeleling 
+
+# Train classifier
+gnb.fit(
+    features_train[used_features].values,  # features are passed
+    features_train["Survived"].values      # labels is passed
+)
+
+
+labels_pred = gnb.predict(features_test[used_features])
+
+
+# Making the Confusion Matrix
+from sklearn.metrics import confusion_matrix
+cm_gnb = confusion_matrix(features_test["Survived"], labels_pred)
+print(cm_gnb)
+
+# Score
+print( (cm_gnb[0][0] + cm_gnb[1][1]) / (cm_gnb[0][0] + cm_gnb[1][1] + cm_gnb[0][1] + cm_gnb[1][0]))
+#0.7647058823529411
+
+mnb = MultinomialNB()
+used_features =[
+
+    "Pclass",
+    "Sex_cleaned",
+    "Age",
+    "SibSp",
+    "Parch",
+    "Fare",
+    "Embarked_cleaned"
+   
+]
+
+# Train classifier
+mnb.fit(
+    features_train[used_features].values,
+    features_train["Survived"].values
+)
+labels_pred = mnb.predict(features_test[used_features])
+
+# Making the Confusion Matrix
+from sklearn.metrics import confusion_matrix
+cm_mnb = confusion_matrix(features_test["Survived"], labels_pred)
+print(cm_mnb)
+
+
+print( (cm_mnb[0][0] + cm_mnb[1][1]) / (cm_mnb[0][0] + cm_mnb[1][1] + cm_mnb[0][1] + cm_mnb[1][0]))
+#0.6694677871148459
+
+bnb = BernoulliNB()
+used_features =[
+
+    "Pclass",
+    "Sex_cleaned",
+    "Age",
+    "SibSp",
+    "Parch",
+    "Fare",
+    "Embarked_cleaned"
+   
+]
+
+# Train classifier
+bnb.fit(
+    features_train[used_features].values,
+    features_train["Survived"]
+)
+labels_pred = bnb.predict(features_test[used_features])
+
+# Making the Confusion Matrix
+from sklearn.metrics import confusion_matrix
+cm_bnb = confusion_matrix(features_test["Survived"], labels_pred)
+print(cm_bnb)
+
+print( (cm_bnb[0][0] + cm_bnb[1][1]) / (cm_bnb[0][0] + cm_bnb[1][1] + cm_bnb[0][1] + cm_bnb[1][0]))
+#0.7478991596638656
+
+=================================================================================================
+
+++++++++++++++++++++++++++++
+
+#Kmeans clustering
+
++++++++++++++++++++++++++++
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+
+dataset = pd.read_csv('xclara.csv')
+features = dataset.iloc[:, [0, 1]].values
+
+#Scatter all these data points on the matplotlib
+# It seems as a human that it will have 3 clusters or groups
+plt.scatter(features[:,0], features[:,1])
+plt.show()
+
+from sklearn.cluster import KMeans
+# Since we have seen the visual, we have told the algo to make 3 cluster
+kmeans = KMeans(n_clusters = 3, init = 'k-means++', random_state = 0)
+
+pred_cluster = kmeans.fit_predict(features) # We have only passed features 
+
+print(pred_cluster) 
+
+
+print(len(features[pred_cluster == 1]))
+print(len(features[pred_cluster == 0]))
+print(len(features[pred_cluster == 2]))
+
+# Will print V1
+print(features[pred_cluster == 0, 0]) 
+
+plt.scatter(features[pred_cluster == 0, 0], features[pred_cluster == 0, 1], c = 'blue', label = 'Cluster 1')
+plt.scatter(features[pred_cluster == 1, 0], features[pred_cluster == 1, 1], c = 'red', label = 'Cluster 2')
+plt.scatter(features[pred_cluster == 2, 0], features[pred_cluster == 2, 1], c = 'green', label = 'Cluster 3')
+
+plt.scatter(features[pred_cluster == 0, 0], features[pred_cluster == 0, 1], c = 'blue', label = 'Cluster 1')
+plt.scatter(features[pred_cluster == 1, 0], features[pred_cluster == 1, 1], c = 'red', label = 'Cluster 2')
+plt.scatter(features[pred_cluster == 2, 0], features[pred_cluster == 2, 1], c = 'green', label = 'Cluster 3')
+plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], c = 'yellow', label = 'Centroids')
+
+
+# Using the elbow method to find the optimal number of clusters
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+dataset = pd.read_csv('xclara.csv')
+
+features = dataset.iloc[:, [0, 1]].values
+   
+#Elbow mathod
+from sklearn.cluster import KMeans
+
+wcss = []
+for i in range(1, 11):
+    kmeans = KMeans(n_clusters = i, init = 'k-means++', random_state = 0)
+    kmeans.fit(features)  # we have not used the fit_predict
+    #print("Cluster " + str(i) +  "  =  " + str(kmeans.inertia_))
+    wcss.append(kmeans.inertia_)     # ( calculates wcss for a cluster )
+    
+print(wcss)
+
+#Now plot it        
+plt.plot(range(1, 11), wcss)
+plt.title('Elbow Method')
+plt.xlabel('Number of Clusters')
+plt.ylabel('WCSS')
+plt.show()
 
 
 
+from sklearn import metrics
+
+labels_true = [0, 0, 0, 1, 1, 1]
+labels_pred = [0, 0, 1, 1, 2, 2]
+
+metrics.homogeneity_score(labels_true, labels_pred)  
+
+metrics.completeness_score(labels_true, labels_pred) 
+
+metrics.v_measure_score(labels_true, labels_pred) 
+
+metrics.homogeneity_completeness_v_measure(labels_true, labels_pred)
+
+
+=======================================================================================
+
++++++++++++++++++++++++++++++
+
+DBSCANE
+
++++++++++++++++++++++++++++++
+
+
+import numpy as np
+
+from sklearn.cluster import DBSCAN
+from sklearn import metrics
+from sklearn.datasets.samples_generator import make_blobs
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+
+# Generate sample data
+centers = [[1, 1], [-1, -1], [1, -1]]  # 3 ---> 0 1 2 
+
+# make_blobs generates random points from any point from a list
+# by default it gives 2 features, 
+features, labels = make_blobs(n_samples=750, centers=centers, cluster_std=0.4,
+                            random_state=0)
+
+plt.scatter(features[:,0], features[:,1])
+plt.show()
 
 
 
+features = StandardScaler().fit_transform(features)
+
+#Scatter all these data points on the matplotlib
+plt.scatter(features[:,0], features[:,1])
+plt.show()
+db = DBSCAN(eps=0.3, min_samples=10).fit(features)
+
+labels_pred = db.labels_ 
+
+import matplotlib.pyplot as plt
 
 
+plt.scatter(features[labels_pred == 0,0], features[labels_pred == 0,1],c='r', marker='+' )
+plt.scatter(features[labels_pred == 1,0], features[labels_pred == 1,1],c='g', marker='o' )
+plt.scatter(features[labels_pred == 2,0], features[labels_pred == 2,1],c='b', marker='s' )
+plt.scatter(features[labels_pred == -1,0],features[labels_pred == -1,1],c='y', marker='*' )
+plt.scatter(features[labels_pred == -2,0],features[labels_pred == -2,1],c='black', marker='d')
 
 
+print(metrics.silhouette_score(features,labels))
+
+==================================================================================================
 
 
+++++++++++++++++++++++++++++++++++++
+
+Apriori association
+
+++++++++++++++++++++++++++++++++++
+
+#Market_Basket_Optimisation.csv
 
 
+import pandas as pd
+from apyori import apriori
+
+# Data Preprocessing
+# Column names of the first row is missing, header - None
+dataset = pd.read_csv('Market_Basket_Optimisation.csv', header = None)
+
+print([str(dataset.values[1,j]) for j in range(0, 20) ])
 
 
+transactions = []
+for i in range(0, 7501):
+    #transactions.append(str(dataset.iloc[i,:].values)) #need to check this one
+    transactions.append([str(dataset.values[i,j]) for j in range(0, 20)])
+
+rules = apriori(transactions, min_support = 0.003, min_confidence = 0.25, min_lift = 4)
+
+print(type(rules))
+
+# Visualising the results
+results = list(rules)
+print(len(results))
+
+results[0]
+results[0].items
+results[0][0]
 
 
+results[0].support 
+results[0][1]  #--> support
 
 
+results[0].confidence 
+# at index = 2 we have ordered_statistics
+results[0][2]
+results[0][2][2]
+results[0][2][0]
+results[0][2][0][2]  #--> Confidence
+results[0][2][0][3]  #--> Lift
 
 
+for item in results:
+    # first index of the inner list
+    # Contains base item and add item
+    pair = item[0] 
+    items = [x for x in pair]
+    print("Rule: " + items[0] + " -> " + items[1])
+
+    #second index of the inner list
+    print("Support: " + str(item[1]))
+
+    #third index of the list located at 0th
+    #of the third index of the inner list
+
+    print("Confidence: " + str(item[2][0][2]))
+    print("Lift: " + str(item[2][0][3]))
+    print("=====================================")
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+=====================================================================================
 
 
 
