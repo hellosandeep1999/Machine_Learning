@@ -2064,14 +2064,124 @@ print(cm)
 ==============================================================================================================
 
 
++++++++++++++++++++++++++++++++
+
+K-fold cross validation
+
++++++++++++++++++++++++++++++
 
 
 
+#Social_Network_Ads_2.csv
 
 
 
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Importing the dataset
+dataset = pd.read_csv('Social_Network_Ads_2.csv')
+features = dataset.iloc[:, [2, 3]].values
+labels = dataset.iloc[:, 4].values
+
+# Splitting the dataset into the Training set and Test set
+from sklearn.model_selection import train_test_split
+features_train, features_test, labels_train, labels_test = \
+train_test_split(features, labels, test_size = 0.25, random_state = 0)
+
+# Feature Scaling
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+features_train = sc.fit_transform(features_train)
+features_test = sc.transform(features_test)
+
+# Fitting Knn to the Training set
+from sklearn.neighbors import KNeighborsClassifier
+classifier = KNeighborsClassifier(n_neighbors = 5, metric = 'minkowski', p = 2)
+classifier.fit(features_train, labels_train)
+
+# Predicting the Test set results
+labels_pred = classifier.predict(features_test)
+
+# Making the Confusion Matrix
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(labels_test, labels_pred)
+print(cm) # 93% (64+29/64+29+4+3)is the score
+print( (cm[0][0] + cm[1][1]) / (cm[0][0] + cm[1][1] + cm[0][1] + cm[1][0]))
 
 
+# Applying k-Fold Cross Validation
+from sklearn.model_selection import cross_val_score
+accuracies = cross_val_score(estimator = classifier, X = features_train, y = labels_train, cv = 10)
+print ("accuracies is ", accuracies)
+print ("mean accuracy is",accuracies.mean())
+#print ("std  accuracy is",accuracies.std())
+
+
+print(features_train.shape)
+
+print(features_test.shape)
+
+
+# Step 1 is to find the minimum and maximum of x and y 
+# 0th column is the x values
+x_min = features_train[:, 0].min() - 1
+x_max = features_train[:, 0].max() + 1
+print(x_min)
+print(x_max)
+
+
+# 1st column is the y values
+y_min = features_train[:, 1].min() - 1
+y_max = features_train[:, 1].max() + 1
+print(y_min)
+print(y_max)
+
+# Step 2
+# We want to generate more points between these range only
+# We need to give minimum and maximum and the difference 
+xx, yy = np.meshgrid(np.arange(x_min, x_max, 0.1),
+                     np.arange(y_min, y_max, 0.1))
+
+
+# We need to flatten all the data of xx, that will come in one column
+# 2D to 1D
+xt = xx.ravel()
+
+# 2D to 1D
+yt = yy.ravel()
+
+pt = np.c_[xt,yt]   # similar to pt = zip(xt,yt) or np.concatenate
+print(pt)
+
+
+Z = classifier.predict(pt)
+
+# We have to reshape the Z as xx and yy 
+Z = Z.reshape(xx.shape)
+
+#plot the decission boundary
+plt.contourf(xx, yy, Z, alpha=1.0)
+
+# class = 0 and x coordinate so 0 and y coordinate so 1
+plt.plot(features_test[labels_test == 0, 0], features_test[labels_test == 0, 1], 'ro', label='Class 1')
+
+
+# class = 1 and x coordinate so 0 and y coordinate so 1
+plt.plot(features_test[labels_test == 1, 0], features_test[labels_test == 1, 1], 'bo', label='Class 2')
+
+
+# U can see from the visual and compare it with cm, that 4 points were different
+# and si milarly for 3 points 
+plt.show()
+print(cm)
+
+"""
+[[64  4]
+ [ 3 29]]
+"""
+-----------------------------------------------------------------------------------------------------
 
 
 
