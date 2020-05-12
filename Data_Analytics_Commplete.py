@@ -1337,7 +1337,341 @@ Analysis of Salaries Data
 
 
 
+============================================================
 
+++++++++++++++++++
+
+#Day 5
+
++++++++++++++++++++
+
+
+
+
+
+
+
+"""
+Code Challenge
+  Name: 
+      Exploratory Data Analysis - Automobile
+  Filename: 
+      automobile.py
+  Dataset:
+      Automobile.csv
+  Problem Statement:
+      Perform the following task :
+      1. Handle the missing values for Price column
+      2. Get the values from Price column into a numpy.ndarray
+      3. Calculate the Minimum Price, Maximum Price, Average Price and Standard Deviation of Price
+      4. Make a pie chart for all car makers
+      
+"""
+
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+# Reading CSV file
+df = pd.read_csv('Automobile.csv')
+
+
+'''1. Handle the missing values for Price column'''
+print(df.dtypes)
+
+# Converting the datatype of price column from object to flaot
+df["price"] = df["price"].astype(float)
+
+
+# Filling the missing values with average of price column
+df[df["price"].isnull()]
+df["price"] = df["price"].fillna(df["price"].mean())
+df[df["price"].isnull()]
+
+
+'''2. Get the values from Price column into a numpy.ndarray'''
+# Converting the price column into a numpy.ndarray
+price_numpy_array = df["price"].values
+
+
+'''3. Calculate the Minimum Price, Maximum Price, Average Price and Standard Deviation of Price'''
+print ( "Minimum Price is {0}".format( df["price"].min() ) )
+print ( "Maximum Price is {0}".format( df["price"].max() ) )
+print ( "Average Price is {0}".format( round( df["price"].mean(), 2 ) ) )
+print ( "Standard Deviation of Price is {0}".format( round( df["price"].std(), 2 ) ) )
+
+
+'''4. Make a pie chart for all car makers'''
+# Make a pie chart for all car makers
+
+series = df["make"].value_counts()
+
+print (series.index[0:11])
+print (series.values[0:11])
+
+explode = (0.5,0,0,0,0,0,0,0,0,0,0)
+
+plt.pie(series.values[0:11], explode = explode, labels=series.index[0:11], autopct='%2.2f%%')
+plt.axis('equal')
+
+
+
+for x,y in zip(series.index, series.values):
+    print (x,y)
+
+
+    
+"""
+Code Challenge
+  Name: 
+    Exploratory Data Analysis - Titanic Analysis
+  Filename: 
+    titanic.py
+  Problem Statement:
+      It’s a real-world data containing the details of 
+      titanic ships passengers list.
+      Import the training set "training_titanic.csv"
+      
+      PassengerId
+      survival: Survival (0 = No; 1 = Yes)
+      pclass: Passenger Class (1 = Upper; 2 = Middle; 3 = Lower)
+      name: Name
+      sex: Sex
+      age: Age 
+      sibsp: Number of Siblings/Spouses Aboard
+      parch: Number of Parents/Children Aboard
+      ticket: Ticket Number
+      fare: Passenger Fare
+      cabin: Cabin
+      embarked: Port of Embarkation 
+      (C = Cherbourg; Q = Queenstown; S = Southampton)
+      
+  Answer the Following:
+      How many people survived the disaster ?
+      
+      How many people died ?
+      
+      Calculate the survival rates as proportions (percentage)
+      
+      Males that survived vs males that passed away
+      
+      Females that survived vs Females that passed away      
+      
+      Does age play a role?
+      Since it's probable that children were saved first.
+               
+"""
+
+import pandas as pd
+df = pd.read_csv('training_titanic.csv')
+
+df.shape
+df.info()
+df.head(10)
+
+
+'''How many people survived the disaster ?'''
+disaster_survived = df['Survived'].value_counts()[1]
+print(str(disaster_survived) + " People Survived")
+
+
+'''How many people died ?'''
+disaster_died = df['Survived'].value_counts()[0]
+print(str(disaster_died)  + " People Died")
+
+
+'''Calculate the survival rates as proportions (percentage)'''
+disaster_survived_percentage = df['Survived'].value_counts(normalize=True)[1]
+print(str(round(float(disaster_survived_percentage)*100,2)) + "% People Survived")
+disaster_died_percentage = df['Survived'].value_counts(normalize=True)[0]
+print(str(round(float(disaster_died_percentage)*100,2)) + "% People Died")
+
+
+'''Males that survived vs males that passed away'''
+male_survived = df['Survived'][df['Sex'] == 'male'].value_counts(normalize=True)[1]
+male_passed_away =  df['Survived'][df['Sex'] == 'male'].value_counts(normalize=True)[0]
+print ("male_survived : "+str(round(male_survived*100,2))+"%")
+print ("male_passed_away : "+str(round(male_passed_away*100,2))+"%")
+
+
+'''Females that survived vs Females that passed away '''
+female_survived = df['Survived'][df['Sex'] == 'female'].value_counts(normalize=True)[1]
+female_passed_away =  df['Survived'][df['Sex'] == 'female'].value_counts(normalize=True)[0]
+print ("female_survived : "+str(round(female_survived*100,2))+"%")
+print ("female_passed_away : "+str(round(female_passed_away*100,2))+"%")
+
+
+
+"""
+Does age play a role?
+Since it's probable that children were saved first.
+"""
+
+# A function to be passed in apply method for performing the above operation
+def filter_data(value):
+    if 0 <= value <= 18:
+        return 1
+    else:
+        return 0
+
+
+df['Child'] = df['Age'].apply(filter_data)
+c =  df['Survived'][df['Child'] == 1].value_counts(normalize=True)
+print ("Child Survived : "+str(round(c[1]*100, 2))+"%")
+
+
+
+
+"""
+Analysis of Salaries Data
+
+1. Which Male Professor has the highest and the lowest salaries
+
+1. Which Female Professor has the highest and the lowest salaries
+   
+2. Which Professor takes the highest and lowest salaries.
+
+3. Missing Salaries - should be mean of the matching salaries of those 
+   whose service is the same
+   
+4. Missing phd - should be mean of the matching service 
+
+5. How many are Male Staff and how many are Female Staff. 
+   Show both numbers and in percentage
+   Show both in numbers and Graphically using Pie Chart.  
+   
+6. How many are Prof, AssocProf and AsstProf. 
+   Show both in numbers and Graphically using a Pie Chart   
+
+7. Who are the senior and junior most employees in the organization.
+
+8. Draw a histogram of the salaries divided into bin starting 
+   from 50K and increment of 15K
+"""
+# Data Preprocessing modules
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Loading the dataset
+df = pd.read_csv("Salaries.csv")
+    
+'''1. Which Male and Female Professor has the highest and the lowest salaries'''
+male_professor = df[(df['sex']=='Male') & (df['rank']=='Prof')].sort_values('salary')
+print(male_professor)
+female_professor = df[(df['sex']=='Female') & (df['rank']=='Prof')].sort_values('salary')
+print(female_professor)
+
+print(male_professor[male_professor['salary'] == male_professor['salary'].max()])
+print(male_professor[male_professor['salary'] == male_professor['salary'].min()])
+
+print(female_professor[female_professor['salary'] == female_professor['salary'].max()])
+print(female_professor[female_professor['salary'] == female_professor['salary'].min()])
+
+
+'''2. Which Professor takes the highest and lowest salaries.'''
+prof_data = df[df['rank']=='Prof'].sort_values('salary')
+print(prof_data)
+print(prof_data[prof_data['salary'] == prof_data['salary'].max()])
+print(prof_data[prof_data['salary'] == prof_data['salary'].min()])
+
+   
+'''3. Missing Salaries - should be mean of the matching salaries of those whose service is the same'''
+# Find those rows in which salary column has NaN
+df[df['salary'].isnull()]
+
+m = df.groupby("service")["salary"].mean()
+ 
+m1=pd.Series(m)[18]  # service is 18 for index = 7
+m2=pd.Series(m)[2]   # service is 2 for index = 28
+
+print (m1)  # 119190.000000
+print (m2)  # 76908.333333
+
+df['salary'][df.index == 7]=m1
+df['salary'][df.index == 28]=m2
+
+df[df['salary'].isnull()]
+
+print(df.loc[7]['salary']  )
+print(df.loc[28]['salary'])
+
+
+
+'''4. Missing phd - should be mean of the matching service '''
+df[df['phd'].isnull()]
+
+phd_grpby = df.groupby("service")["phd"].mean()
+
+phd_n1=pd.Series(phd_grpby)[33] # service is 33 for index = 13
+phd_n2=pd.Series(phd_grpby)[8]  # service is 8 for index = 34
+
+print(phd_n1)  # 39.000000
+print(phd_n2)  # 14.333333
+
+
+# fill all the records with missing values, with mean of the matching service 
+df['phd'][df.index == 13]=phd_n1
+df['phd'][df.index == 34]=phd_n2
+
+df[df['phd'].isnull()]
+
+print(df.loc[13]['phd']  )
+print(df.loc[34]['phd'])
+
+'''5. How many are Male Staff and How many are Female Staff. '''
+# Show both in numbers and Graphically using Pie Chart.  
+# Show both numbers and in percentage
+data_gender = df['sex'].value_counts().reset_index()
+
+"""Alternative-
+1.data_gender = data.groupby('sex').size().reset_index()
+2. data_gender = pd.DataFrame(data['sex'].value_counts())
+"""
+data_gender_ref = pd.DataFrame()
+data_gender_ref['Male'] = [data_gender['sex'][0]]
+data_gender_ref['Female'] = [data_gender['sex'][1]]
+    
+plt.pie([data_gender_ref['Male'], data_gender_ref['Female']], explode=[0, 0], labels=['male','female'], autopct="%1.1f%%")
+plt.axis('equal')
+
+        
+'''6. How many are Prof, AssocProf and AsstProf. '''
+# Show both in numbers adn Graphically using a Pie Chart
+data_rank = df['rank'].value_counts().reset_index()
+data_rank_ref = pd.DataFrame()
+data_rank_ref['Prof'] = [data_rank['rank'][0]]
+data_rank_ref['AsstProf'] = [data_rank['rank'][1]]
+data_rank_ref['AsscProf'] = [data_rank['rank'][2]]
+    
+plt.pie([data_rank_ref['Prof'], data_rank_ref['AsstProf'],data_rank_ref['AsscProf'] ], explode=[0, 0,0], labels=['Prof','AsstProf', 'AsscProf'], autopct="%1.1f%%")
+plt.axis('equal')
+
+
+    
+'''7. Who are the senior and junior most employees in the organization.'''
+data_service = df.sort_values(['service'])
+print(data_service[data_service['service'] == data_service['service'].max()])
+print(data_service[data_service['service'] == data_service['service'].min()])
+   
+
+'''8. Draw a histogram of the salaries divided into bin starting from 50K and increment of 15K'''
+df['salary']
+df['salary'].min()
+df['salary'].max()
+
+plt.hist(df['salary'], bins=range(50000, 190000, 15000), facecolor='g')
+plt.xlabel('Salary')
+plt.ylabel('Frequency')
+plt.title('Salary distribution')
+plt.grid(True)
+plt.show()
+
+
+#distribution of salary using histogram with pandas
+new_df = df['salary']
+new_df.hist(bins=20,grid=False)
 
 
 
