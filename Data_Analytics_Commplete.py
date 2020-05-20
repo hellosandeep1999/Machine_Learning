@@ -167,6 +167,20 @@ plt.show()
 
         
 
+
+
+
+------------------------------------------------------------
+
+
+++++++++++++++++++++++++++++
+
+# Another Example of Bar Chart
+  
+
++++++++++++++++++++++++++++++++++
+
+
 """
 Plotting a bar chart
 """
@@ -184,15 +198,8 @@ plt.title('Programming Language Usage')
  
 plt.show()
 
-------------------------------------------------------------
 
 
-++++++++++++++++++++++++++++
-
-# Another Example of Bar Chart
-  
-
-+++++++++++++++++++++++++++++++++
 
 
 import matplotlib.pyplot as plt
