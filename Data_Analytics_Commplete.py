@@ -309,7 +309,7 @@ customerWaitTime.sort()
 #Ramesh can conclude that the majority of customers wait between 35.1 and 50 seconds.
 
 print(customerWaitTime)
- 
+
 plt.hist(customerWaitTime,bins=[25,30,35,40,45,50,55]) 
 
 plt.axis([25, 60, 0, 6]) 
