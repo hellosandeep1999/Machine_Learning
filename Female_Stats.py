@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Sat May 23 16:56:15 2020
+
+@author: user
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Wed Mar 18 16:47:32 2020
 
 @author: user
@@ -96,40 +103,24 @@ When Father’s Height Is Held Constant, The Average Student Height Increases By
 """
 
 
-# Importing the libraries
-import numpy as np
-import pandas as pd
+#Father's height constant
+#test1
+x = [75,75]
+x = np.array(x)
+x = x.reshape(1,2)
+Pred1 = regressor.predict(x)
+print(Pred1)
 
-# Importing the dataset
-dataset = pd.read_csv('Female_Stats.Csv')
+#test2
+x = [76,75]  #mom height increase by one
+x = np.array(x)
+x = x.reshape(1,2)
+Pred2 = regressor.predict(x)
+print(Pred2)
 
-# Check data Types for each columns
-print(dataset.dtypes)
-
-# Seperate Features and Labels
-features = dataset.iloc[:,[1]].values
-labels = dataset.iloc[:, [0]].values
-
-# Check Column wise is any data is missing or NaN
-dataset.isnull().any(axis=0)
-
-# Check data Types for each columns
-print(dataset.dtypes)
-
-from sklearn.model_selection import train_test_split
-features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size = 0.2, random_state = 0)
-
-# Fitting Multiple Linear Regression to the Training set
-# Whether we have Univariate or Multivariate, class is LinearRegression
-
-from sklearn.linear_model import LinearRegression
-regressor = LinearRegression()
-regressor.fit(features_train, labels_train)
-
-Pred = regressor.predict(features_test)
-
-print (pd.DataFrame(zip(Pred, labels_test)))
-
+#difference
+diff = Pred2 - Pred1
+print("Student height will be increase by ",diff)   #[[0.30645861]]
 
 
 
@@ -145,39 +136,24 @@ When Mother’s Height Is Held Constant, The Average Student Height Increases By
 """
 
 
-import numpy as np
-import pandas as pd
+#mothers's height constant
+#test1
+x = [75,75]
+x = np.array(x)
+x = x.reshape(1,2)
+Pred1 = regressor.predict(x)
+print(Pred1)
 
-# Importing the dataset
-dataset = pd.read_csv('Female_Stats.Csv')
+#test2
+x = [75,76]  #mom height increase by one
+x = np.array(x)
+x = x.reshape(1,2)
+Pred2 = regressor.predict(x)
+print(Pred2)
 
-# Check data Types for each columns
-print(dataset.dtypes)
-
-# Seperate Features and Labels
-features = dataset.iloc[:,[2]].values
-labels = dataset.iloc[:, [0]].values
-
-# Check Column wise is any data is missing or NaN
-dataset.isnull().any(axis=0)
-
-# Check data Types for each columns
-print(dataset.dtypes)
-
-from sklearn.model_selection import train_test_split
-features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size = 0.2, random_state = 0)
-
-# Fitting Multiple Linear Regression to the Training set
-# Whether we have Univariate or Multivariate, class is LinearRegression
-
-from sklearn.linear_model import LinearRegression
-regressor = LinearRegression()
-regressor.fit(features_train, labels_train)
-
-Pred = regressor.predict(features_test)
-
-print (pd.DataFrame(zip(Pred, labels_test)))
-
+#difference
+diff = Pred2 - Pred1
+print("Student height will be increase by ",diff)   #[[0.40262219]]
 
 
 
